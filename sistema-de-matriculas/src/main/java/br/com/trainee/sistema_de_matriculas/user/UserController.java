@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import br.com.trainee.sistema_de_matriculas.user.dto.LoginDto;
 
 @RestController //controlador, vai dizer o que cada metodo vai fazer na rota especifica
 @RequestMapping("/aluno")
@@ -32,6 +33,30 @@ public class UserController {
         var userCreated = this.userRepository.save(userModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(userCreated); //retorna uma response e cada "." é o que ela tem, nesse caso o status e o body em json
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginDto loginDto){
+
+        var userOptional = this.userRepository.findByEmail(loginDto.getEmail()); // busco o usuario pelo email do dto
+
+        if (!userOptional.isPresent()){ // se nao encontrou o email no banco de dados
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("email ou senha incorretos.");
+        }
+
+        var user = userOptional.get(); //pega o usuario dentro do optional
+
+        var validPassword = BCrypt.verifyer().verify(loginDto.getPassword().toCharArray(), user.getPassword()); //vai verificar se as senhas sao iguais
+
+        if (!validPassword.verified){ // se nao forem iguais
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("email ou senha incorretos.");
+        }
+
+        return ResponseEntity.ok().body("Login efetuado com sucesso");
+
+
+        
+        
     }
 
 
