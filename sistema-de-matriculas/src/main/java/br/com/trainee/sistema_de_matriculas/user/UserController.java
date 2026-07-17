@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import br.com.trainee.sistema_de_matriculas.security.JwtService;
 import br.com.trainee.sistema_de_matriculas.user.dto.LoginDto;
 
 @RestController //controlador, vai dizer o que cada metodo vai fazer na rota especifica
@@ -17,6 +18,9 @@ public class UserController {
     
     @Autowired// faz a configuracao automatica do iuserepository
     private IUserRepository userRepository;
+
+    @Autowired
+    private JwtService jwtService; 
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody UserModel userModel){ // vai colocar/criar na tabela o usuario (aluno) qunado eu der um post (cadastrar)
@@ -52,13 +56,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("email ou senha incorretos.");
         }
 
-        return ResponseEntity.ok().body("Login efetuado com sucesso");
+        String token = this.jwtService.generateToken(user.getId().toString()); // gera o token jwt logo apos o login
 
+        return ResponseEntity.ok().body(token);// retorna a response com o token
 
-        
-        
     }
-
-
 
 }
