@@ -42,9 +42,9 @@ public class JwtService {
             return Jwts.parser()
                     .verifyWith(getSigningKey())//Valida a assinatura digital usando a secret-key do properties
                     .build()//Reconstrói o decodificador configurado
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
+                    .parseSignedClaims(token) //abre o token para ver se ele nao foi modifiado no caminho
+                    .getPayload() //entra no corpo do token
+                    .getSubject(); //le e retorna o id do aluno
             } catch (ExpiredJwtException e) {
                 System.out.println("Token expirado.");
             } catch (MalformedJwtException e) {
