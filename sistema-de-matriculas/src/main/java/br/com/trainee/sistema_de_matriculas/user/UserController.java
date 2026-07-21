@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.com.trainee.sistema_de_matriculas.security.JwtService;
 import br.com.trainee.sistema_de_matriculas.user.dto.LoginDto;
+import br.com.trainee.sistema_de_matriculas.user.dto.ResetPasswordDto;
 
 @RestController //controlador, vai dizer o que cada metodo vai fazer na rota especifica
 @RequestMapping("/aluno")
@@ -24,7 +25,31 @@ public class UserController {
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody UserModel userModel){ // vai colocar/criar na tabela o usuario (aluno) qunado eu der um post (cadastrar)
+   
+        //verificacao dos campos pra ver se nenhum deles chega vazio
+        if (userModel.getNome() == null || userModel.getNome().trim().isEmpty() ||
+            userModel.getEmail() == null || userModel.getEmail().trim().isEmpty() ||
+            userModel.getPassword() == null || userModel.getPassword().trim().isEmpty()) {
+            
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Preencha todos os campos.");
+        }
 
+        //verificacao do formato de email
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
+        if (!userModel.getEmail().matches(emailRegex)) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Insira um endereço de e-mail válido.");
+    }
+        //trava no tamanho da senha
+        if (userModel.getPassword().length() < 6) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("A senha deve ter no mínimo 6 caracteres.");
+        }
         var emailOptional = this.userRepository.findByEmail(userModel.getEmail());
 
         if (emailOptional.isPresent()){ //se o email ja existe
@@ -37,6 +62,36 @@ public class UserController {
         var userCreated = this.userRepository.save(userModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(userCreated); //retorna uma response e cada "." é o que ela tem, nesse caso o status e o body em json
 
+    }
+
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity esqueciSenha(@RequestBody ResetPasswordDto dto) {
+
+        //faz uma validacao com um codigo fixo por mim, no caso vai ser "6716"
+        if (!"6716".equals(dto.getCode())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Código de verificação inválido!");
+        }
+
+        //valida nova senha
+        if (dto.getNewPassword() == null || dto.getNewPassword().length() < 6) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A nova senha deve ter no mínimo 6 caracteres.");
+        }
+
+        //busca o usuário no banco pelo email
+        var userOptional = this.userRepository.findByEmail(dto.getEmail());
+
+        if (!userOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+        }
+
+        //pega o usuário, criptografa a nova senha e salva no postgres
+        var user = userOptional.get();
+        var newPasswordHashed = BCrypt.withDefaults().hashToString(12, dto.getNewPassword().toCharArray());
+        
+        user.setPassword(newPasswordHashed);
+        this.userRepository.save(user);
+
+        return ResponseEntity.ok().body("Senha alterada com sucesso! Você já pode fazer login.");
     }
 
     @PostMapping("/login")
