@@ -31,6 +31,7 @@ public class SecutiryConfig {
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, "/aluno/login").permitAll() //permite que qualquer pessoa faça post em /aluno/login
                     .requestMatchers(HttpMethod.POST, "/aluno/").permitAll() //permite que qualquer pessoa faça post em /aluno/
+                    .requestMatchers(HttpMethod.POST, "/aluno/esqueci-senha").permitAll()//permite que qualquer pessoa possa alterar a senha
                     .anyRequest().authenticated() //qualquer outra acao em qualquer rota precisa de autenticacao
                 )
                 .addFilterBefore(secutiryFilter, UsernamePasswordAuthenticationFilter.class) //roda o security filter antes da autenticacao por user e senha do securityfilter
