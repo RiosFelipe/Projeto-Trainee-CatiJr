@@ -1,4 +1,4 @@
-package br.com.trainee.sistema_de_matriculas.user.dto;
+package br.com.trainee.sistema_de_matriculas.dto;
 
 import lombok.Data;
 
