@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import br.com.trainee.sistema_de_matriculas.dto.LoginDto;
+import br.com.trainee.sistema_de_matriculas.dto.ResetPasswordDto;
 import br.com.trainee.sistema_de_matriculas.security.JwtService;
-import br.com.trainee.sistema_de_matriculas.user.dto.LoginDto;
-import br.com.trainee.sistema_de_matriculas.user.dto.ResetPasswordDto;
 
 @RestController //controlador, vai dizer o que cada metodo vai fazer na rota especifica
 @RequestMapping("/aluno")
