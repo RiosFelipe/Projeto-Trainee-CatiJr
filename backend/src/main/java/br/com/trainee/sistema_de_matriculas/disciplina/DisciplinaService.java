@@ -2,14 +2,15 @@ package br.com.trainee.sistema_de_matriculas.disciplina;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class DisciplinaService {
-    
-    @Autowired
-    private IDisciplinaRepository disciplinaRepository;
+
+    private final IDisciplinaRepository disciplinaRepository;
 
     public DisciplinaModel salvar(DisciplinaModel disciplinaModel){ //cadastra as disciplinas
         return this.disciplinaRepository.save(disciplinaModel);

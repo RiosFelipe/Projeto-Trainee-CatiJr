@@ -1,7 +1,6 @@
 package br.com.trainee.sistema_de_matriculas.security;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,23 +13,25 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecutiryConfig {
 
-    @Autowired
-    private SecutiryFilter secutiryFilter;
+    private final SecutiryFilter secutiryFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // 1. Ativa a configuração de CORS que definimos abaixo
+                //ativa a configuração de CORS que definimos abaixo
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) //libera o frontend de acordo com o codigo do corsconfiguration
                 .csrf(csrf -> csrf.disable()) //desabilita a protecao contra CSRF (Cross-Site Request Forgery), ja que o jwt nao precisa se preocupar com isso
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// 
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, "/aluno/login").permitAll() //permite que qualquer pessoa faça post em /aluno/login
-                    .requestMatchers(HttpMethod.POST, "/aluno/").permitAll() //permite que qualquer pessoa faça post em /aluno/
+                    .requestMatchers(HttpMethod.POST, "/aluno").permitAll() //permite que qualquer pessoa faça post em /aluno/
                     .requestMatchers(HttpMethod.POST, "/aluno/esqueci-senha").permitAll()//permite que qualquer pessoa possa alterar a senha
                     .anyRequest().authenticated() //qualquer outra acao em qualquer rota precisa de autenticacao
                 )
@@ -38,7 +39,7 @@ public class SecutiryConfig {
                 .build();
     }
 
-    // 2. Configura quais origens e métodos são permitidos
+    //configura quais origens e métodos são permitidos
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
