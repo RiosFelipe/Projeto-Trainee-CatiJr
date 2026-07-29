@@ -28,8 +28,8 @@ export default function SignupCard({ onNavigate }: SignupCardProps) {
     }
 
     try {
-      //envia pro endereço do usercontroller (@PostMapping("/")
-      await axios.post('http://localhost:8080/aluno/', {
+      //envia pro endereço do usercontroller (@PostMapping)
+      await axios.post('http://localhost:8080/aluno', {
         nome,
         email,
         password
