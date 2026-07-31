@@ -4,11 +4,17 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import br.com.trainee.sistema_de_matriculas.disciplina.DisciplinaModel;
 import br.com.trainee.sistema_de_matriculas.disciplina.HorarioAula;
 import br.com.trainee.sistema_de_matriculas.disciplina.IDisciplinaRepository;
+import br.com.trainee.sistema_de_matriculas.matricula.IMatriculaRepository;
+import br.com.trainee.sistema_de_matriculas.matricula.MatriculaModel;
+import br.com.trainee.sistema_de_matriculas.user.IUserRepository;
+import br.com.trainee.sistema_de_matriculas.user.UserModel;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -16,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class DatabaseSeeder implements CommandLineRunner {
     
     private final IDisciplinaRepository disciplinaRepository;
+    private final IUserRepository userRepository;
+    private final IMatriculaRepository matriculaRepository;
 
     @Override
     public void run (String... args) throws Exception{ //vai povoar so uma vez o postgres
@@ -129,6 +137,118 @@ public class DatabaseSeeder implements CommandLineRunner {
     mc.setStatus(DisciplinaModel.StatusDisciplina.DISPONIVEL);
     mc.setPreRequisitos(List.of());
     mc = this.disciplinaRepository.save(mc);
+
+
+    //Arquitetura de Computadores
+
+    DisciplinaModel arq = new DisciplinaModel();
+
+    HorarioAula h12= new HorarioAula("TERCA",LocalTime.of(14,0),LocalTime.of(16,0));
+    HorarioAula h13= new HorarioAula("QUINTA",LocalTime.of(10,0),LocalTime.of(12,0));
+    HorarioAula h14= new HorarioAula("QUINTA",LocalTime.of(16,0),LocalTime.of(18,0));
+
+    arq.setCodigo("ARQ");
+    arq.setNome("Arquitetura de Computadores");
+    arq.setCreditos(6);
+    arq.setVagas(60);
+    arq.setHorarios(List.of(h12,h13,h14)); 
+    arq.setDescricao("Estudo da estrutura e do funcionamento dos computadores.");
+    arq.setNomeProfessor("Ricardo Menotti");
+    arq.setStatus(DisciplinaModel.StatusDisciplina.DISPONIVEL);
+    arq.setPreRequisitos(List.of(ld)); //precisa de ld pra fazer arq
+    arq = this.disciplinaRepository.save(arq);
+
+    //Programação Orientada a Objetos
+
+    DisciplinaModel poo = new DisciplinaModel();
+
+    HorarioAula h15 = new HorarioAula("SEGUNDA", LocalTime.of(14, 0), LocalTime.of(16, 0));
+    HorarioAula h16 = new HorarioAula("QUINTA", LocalTime.of(10, 0), LocalTime.of(12, 0));
+
+        poo.setCodigo("POO");
+        poo.setNome("Programação Orientada a Objetos");
+        poo.setCreditos(4);
+        poo.setVagas(60);
+        poo.setHorarios(List.of(h15,h16));
+        poo.setDescricao("Conceitos de objetos, classes, herança, polimorfismo e encapsulamento.");
+        poo.setNomeProfessor("Renato Bueno");
+        poo.setStatus(DisciplinaModel.StatusDisciplina.DISPONIVEL);
+        poo.setPreRequisitos(List.of(cap));
+        poo = this.disciplinaRepository.save(poo);
+
+    //Probabilidade e Estatística
+
+        DisciplinaModel probest = new DisciplinaModel();
+
+        HorarioAula h17 = new HorarioAula("SEGUNDA", LocalTime.of(16, 0), LocalTime.of(18, 0));
+        HorarioAula h18 = new HorarioAula("QUARTA", LocalTime.of(16, 0), LocalTime.of(18, 0));
+
+        probest.setCodigo("PROBEST");
+        probest.setNome("Probabilidade e Estatística");
+        probest.setCreditos(4);
+        probest.setVagas(60);
+        probest.setHorarios(List.of(h17,h18));
+        probest.setDescricao("Conceitos fundamentais de probabilidade, variáveis aleatórias e inferência.");
+        probest.setNomeProfessor("Maria Silvia de Assis Moura");
+        probest.setStatus(DisciplinaModel.StatusDisciplina.DISPONIVEL);
+        probest.setPreRequisitos(List.of(calculo1));
+        probest = this.disciplinaRepository.save(probest);
+    
+
+    //Geometria Analítica 
+        DisciplinaModel ga = new DisciplinaModel();
+        
+        HorarioAula h19  = new HorarioAula("QUINTA", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        HorarioAula h20 = new HorarioAula("TERCA", LocalTime.of(10, 0), LocalTime.of(12, 0));
+        ga.setCodigo("GA");
+        ga.setNome("Geometria Analítica");
+        ga.setCreditos(4);
+        ga.setVagas(60);
+        ga.setHorarios(List.of(h19,h20));
+        ga.setDescricao("Vetores, retas, planos e superfícies no espaço euclidiano.");
+        ga.setNomeProfessor("Claudia Buttarello Gentile Moussa");
+        ga.setStatus(DisciplinaModel.StatusDisciplina.DISPONIVEL);
+        ga.setPreRequisitos(List.of());
+        ga = this.disciplinaRepository.save(ga);
+
+    //mock de aluno com disciplinas concluidas e reprovadas
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    UserModel alunoMock = new UserModel();
+    alunoMock.setNome("Felipe Amaro Rios");
+    alunoMock.setEmail("felipe@gmail.com");
+    alunoMock.setPassword(encoder.encode("password"));
+    alunoMock = this.userRepository.save(alunoMock);
+
+
+    MatriculaModel matriculaConcluida1 = new MatriculaModel();
+    matriculaConcluida1.setAluno(alunoMock);
+    matriculaConcluida1.setDisciplina(cap);
+    matriculaConcluida1.setStatus(MatriculaModel.StatusMatricula.CONCLUIDA); 
+    this.matriculaRepository.save(matriculaConcluida1);
+
+
+    MatriculaModel matriculaReprovada = new MatriculaModel();
+    matriculaReprovada.setAluno(alunoMock);
+    matriculaReprovada.setDisciplina(ld);
+    matriculaReprovada.setStatus(MatriculaModel.StatusMatricula.REPROVADA); 
+    this.matriculaRepository.save(matriculaReprovada);
+
+
+    MatriculaModel matriculaConcluida2 = new MatriculaModel();
+    matriculaConcluida2.setAluno(alunoMock);
+    matriculaConcluida2.setDisciplina(ipa);
+    matriculaConcluida2.setStatus(MatriculaModel.StatusMatricula.CONCLUIDA); 
+    this.matriculaRepository.save(matriculaConcluida2);
+
+
+    MatriculaModel matriculaConcluida3 = new MatriculaModel();
+    matriculaConcluida3.setAluno(alunoMock);
+    matriculaConcluida3.setDisciplina(calculo1);
+    matriculaConcluida3.setStatus(MatriculaModel.StatusMatricula.CONCLUIDA); 
+    this.matriculaRepository.save(matriculaConcluida3);
+
 }
 
 }
