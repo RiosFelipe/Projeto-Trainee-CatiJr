@@ -30,8 +30,8 @@ export default function LoginCard({ onNavigate }: LoginCardProps) {
       onNavigate?.('dashboard')
     } catch (error: any) {
       if (error.response) {
-        const errorMessage = error.response.data
-        alert(errorMessage || 'E-mail ou senha incorretos.')
+        const errorMessage = error.response.data?.message || error.response.data
+        alert(typeof errorMessage === 'string' ? errorMessage : 'E-mail ou senha incorretos.')
       } else if (error.request) {
         alert('Sem resposta do servidor. O seu backend Spring Boot está rodando?')
       } else {

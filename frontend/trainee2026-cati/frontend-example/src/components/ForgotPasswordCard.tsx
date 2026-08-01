@@ -42,7 +42,8 @@ export default function ForgotPasswordCard({ onNavigate }: ForgotPasswordCardPro
 
     } catch (error: any) {
       if (error.response) {
-        alert(error.response.data)
+        const msg = error.response.data?.message || error.response.data
+        alert(typeof msg === 'string' ? msg : 'Erro ao redefinir a senha.')
       } else {
         alert('Erro ao redefinir a senha.')
       }
