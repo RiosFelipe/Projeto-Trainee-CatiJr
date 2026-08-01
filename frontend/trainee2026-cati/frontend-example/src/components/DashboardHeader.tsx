@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { GraduationCapIcon, MenuIcon } from '../assets/icons'
-import { User } from '../types'
+import type { User } from '../types'
 
 interface DashboardHeaderProps {
-  user: User
+  user: User | null
 }
 
 interface NavLink {
@@ -60,19 +60,34 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
             ))}
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3">
+            {/* Right side */}
+            <div className="flex items-center gap-3">
+
+              {/* Logout */}
+              <button
+                onClick={() => {
+                  localStorage.removeItem('token')
+                  localStorage.removeItem('userEmail')
+                  localStorage.removeItem('userName')
+                  window.location.reload()
+                }}
+                className="text-sm text-ui-muted hover:text-ui-dark transition-colors font-medium hidden sm:block"
+              >
+                Sair
+              </button>
 
             {/* User badge */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center shrink-0">
                 <span className="text-white text-xs font-semibold leading-none">
-                  {getInitials(user.name)}
+                  {getInitials(user?.nome || user?.email || 'U')}
                 </span>
               </div>
               <div className="hidden sm:flex flex-col leading-tight">
-                <span className="text-sm font-medium text-ui-dark">{user.name}</span>
-                <span className="text-xs text-ui-muted">{user.periodo}</span>
+                <span className="text-sm font-medium text-ui-dark">
+                  {user?.nome || user?.email?.split('@')[0] || 'Usuário'}
+                </span>
+                <span className="text-xs text-ui-muted">Aluno</span>
               </div>
             </div>
 

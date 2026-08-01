@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import { GraduationCapIcon, EyeOffIcon } from '../assets/icons'
 import InputField from './InputField'
 import { Page } from '../types'
-import axios from 'axios'
+import api from '../services/api'
 
 interface SignupCardProps {
   onNavigate?: (page: Page) => void
@@ -10,42 +10,32 @@ interface SignupCardProps {
 
 export default function SignupCard({ onNavigate }: SignupCardProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    // 1. Captura os dados diretamente do formulário usando a API FormData
     const formData = new FormData(e.currentTarget)
     const nome = formData.get('nome')
     const email = formData.get('email')
     const password = formData.get('password')
     const confirmPassword = formData.get('confirmPassword')
 
-    //validação local de senha
     if (password !== confirmPassword) {
       alert('As senhas não coincidem!')
       return
     }
 
     try {
-      //envia pro endereço do usercontroller (@PostMapping)
-      await axios.post('http://localhost:8080/aluno', {
-        nome,
-        email,
-        password
-      })
+      setLoading(true)
 
-      alert('Cadastro realizado com sucesso!')
+      await api.post('/aluno', { nome, email, password })
 
-      //redireciona o aluno para a tela de Login
+      localStorage.setItem('userName', nome as string)
+
       onNavigate?.('login')
-
     } catch (error: any) {
-      console.error('Erro no cadastro:', error)
-
-      //trata a resposta enviada 
       if (error.response) {
-        //se o backend retornou "email já existe" (HttpStatus.BAD_REQUEST)
         const mensagemDoJava = error.response.data
         alert(mensagemDoJava || 'Erro ao realizar o cadastro.')
       } else if (error.request) {
@@ -53,6 +43,8 @@ export default function SignupCard({ onNavigate }: SignupCardProps) {
       } else {
         alert('Erro ao processar a requisição.')
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -120,9 +112,10 @@ export default function SignupCard({ onNavigate }: SignupCardProps) {
 
         <button
           type="submit"
-          className="w-full bg-brand-accent text-white font-normal text-base leading-6 py-[14px] rounded-lg shadow-[0px_4px_6px_-1px_rgba(79,70,229,0.2),0px_2px_4px_-2px_rgba(79,70,229,0.2)] hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
+          disabled={loading}
+          className="w-full bg-brand-accent text-white font-normal text-base leading-6 py-[14px] rounded-lg shadow-[0px_4px_6px_-1px_rgba(79,70,229,0.2),0px_2px_4px_-2px_rgba(79,70,229,0.2)] hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Criar Conta
+          {loading ? 'Criando conta...' : 'Criar Conta'}
         </button>
       </form>
 
