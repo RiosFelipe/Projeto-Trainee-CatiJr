@@ -1,13 +1,50 @@
 export type Page = 'login' | 'signup' | 'dashboard' | 'forgot-password'
 
 export interface User {
-  id: number
-  name: string
+  id: string
+  nome: string
   email: string
-  matricula: string
-  curso: string
-  periodo: string
-  semestre: string
-  password: string
-  avatar: string | null
+}
+
+export interface Horario {
+  diaDaSemana: string
+  horarioInicio: string
+  horarioFim: string
+}
+
+export interface PreRequisito {
+  id: string
+  codigo: string
+  nome: string
+}
+
+export interface Disciplina {
+  id: string
+  codigo: string
+  nome: string
+  creditos: number
+  vagas: number
+  descricao: string
+  nomeProfessor: string
+  status: 'DISPONIVEL' | 'INDISPONIVEL'
+  horarios: Horario[]
+  preRequisitos: PreRequisito[]
+}
+
+export interface Matricula {
+  id: string
+  disciplinaId: string
+  disciplinaNome: string
+  disciplinaCodigo: string
+  disciplinaCreditos: number
+  status: StatusMatricula
+}
+
+export type StatusMatricula = 'INSCRITA' | 'CONCLUIDA' | 'REPROVADA'
+
+export type ValidationError = 'PREREQUISITO' | 'CREDITOS' | 'HORARIO'
+
+export interface CatalogDisciplina extends Disciplina {
+  matriculaStatus: StatusMatricula | null
+  validationError: ValidationError | null
 }

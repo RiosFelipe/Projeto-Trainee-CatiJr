@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import { GraduationCapIcon } from '../assets/icons'
 import InputField from './InputField'
 import { Page } from '../types'
-import axios from 'axios'
+import api from '../services/api'
 
 interface ForgotPasswordCardProps {
   onNavigate?: (page: Page) => void
@@ -31,7 +31,7 @@ export default function ForgotPasswordCard({ onNavigate }: ForgotPasswordCardPro
     const newPassword = formData.get('newPassword')
 
     try {
-      const response = await axios.post('http://localhost:8080/aluno/esqueci-senha', {
+      const response = await api.post('/aluno/esqueci-senha', {
         email: emailSaved,
         code,
         newPassword
