@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import DashboardHeader from '../components/DashboardHeader'
+import DashboardHeader, { type DashboardTab } from '../components/DashboardHeader'
 import CatalogHeading from '../components/CatalogHeading'
 import DisciplineCard from '../components/DisciplineCard'
 import api, { decodeToken } from '../services/api'
@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const [enrollingId, setEnrollingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState<DashboardTab>('catalogo')
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -33,6 +34,10 @@ export default function DashboardPage() {
 
     loadCatalog()
   }, [])
+
+  useEffect(() => {
+    setSearchQuery('')
+  }, [activeTab])
 
   async function loadCatalog() {
     try {
@@ -150,6 +155,28 @@ export default function DashboardPage() {
     }
   }
 
+  const isMinhasMaterias = activeTab === 'minhas-materias'
+
+  const filteredDisciplinas = disciplinas
+    .filter((d) => {
+      if (isMinhasMaterias) {
+        return d.matriculaStatus !== null
+      }
+      return true
+    })
+    .filter((d) => {
+      if (!searchQuery.trim()) return true
+      const q = searchQuery.toLowerCase()
+      return (
+        d.nome.toLowerCase().includes(q) ||
+        d.codigo.toLowerCase().includes(q)
+      )
+    })
+
+  const totalCreditosInscritos = disciplinas
+    .filter((d) => d.matriculaStatus === 'INSCRITA')
+    .reduce((sum, d) => sum + d.creditos, 0)
+
   if (loading) {
     return (
       <div className="min-h-screen bg-ui-bg flex items-center justify-center">
@@ -163,10 +190,17 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-ui-bg">
-      <DashboardHeader user={user} />
+      <DashboardHeader user={user} activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <CatalogHeading semestre="2024.2" />
+        {isMinhasMaterias ? (
+          <CatalogHeading
+            title="Minhas Matérias"
+            subtitle={`Você está inscrito em ${totalCreditosInscritos} de 24 créditos neste semestre.`}
+          />
+        ) : (
+          <CatalogHeading semestre="2024.2" />
+        )}
 
         <div className="mt-6">
           <div className="relative w-full max-w-md">
@@ -201,46 +235,24 @@ export default function DashboardPage() {
         )}
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {disciplinas
-            .filter((d) => {
-              if (!searchQuery.trim()) return true
-              const q = searchQuery.toLowerCase()
-              return (
-                d.nome.toLowerCase().includes(q) ||
-                d.codigo.toLowerCase().includes(q)
-              )
-            })
-            .map((d) => (
-              <DisciplineCard
-                key={d.id}
-                disciplina={d}
-                onEnroll={handleEnroll}
-                onCancel={handleCancel}
-                loading={enrollingId === d.id}
-              />
-            ))}
+          {filteredDisciplinas.map((d) => (
+            <DisciplineCard
+              key={d.id}
+              disciplina={d}
+              onEnroll={handleEnroll}
+              onCancel={handleCancel}
+              loading={enrollingId === d.id}
+            />
+          ))}
         </div>
 
-        {!error && disciplinas.length === 0 && (
+        {!error && filteredDisciplinas.length === 0 && (
           <div className="mt-8 text-center text-ui-muted">
-            Nenhuma disciplina disponível no momento.
+            {isMinhasMaterias
+              ? 'Você não está inscrito em nenhuma disciplina no momento.'
+              : 'Nenhuma disciplina disponível no momento.'}
           </div>
         )}
-
-        {!error &&
-          disciplinas.length > 0 &&
-          disciplinas.filter((d) => {
-            if (!searchQuery.trim()) return true
-            const q = searchQuery.toLowerCase()
-            return (
-              d.nome.toLowerCase().includes(q) ||
-              d.codigo.toLowerCase().includes(q)
-            )
-          }).length === 0 && (
-            <div className="mt-8 text-center text-ui-muted">
-              Nenhuma disciplina encontrada para "{searchQuery}".
-            </div>
-          )}
       </main>
     </div>
   )

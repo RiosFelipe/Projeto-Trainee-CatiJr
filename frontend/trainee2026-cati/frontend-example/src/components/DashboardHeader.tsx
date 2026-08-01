@@ -2,14 +2,12 @@ import { useState } from 'react'
 import { GraduationCapIcon, MenuIcon } from '../assets/icons'
 import type { User } from '../types'
 
+export type DashboardTab = 'catalogo' | 'minhas-materias'
+
 interface DashboardHeaderProps {
   user: User | null
-}
-
-interface NavLink {
-  label: string
-  href: string
-  active: boolean
+  activeTab: DashboardTab
+  onTabChange: (tab: DashboardTab) => void
 }
 
 function getInitials(name: string): string {
@@ -20,11 +18,12 @@ function getInitials(name: string): string {
     .join('')
 }
 
-export default function DashboardHeader({ user }: DashboardHeaderProps) {
+export default function DashboardHeader({ user, activeTab, onTabChange }: DashboardHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const navLinks: NavLink[] = [
-    { label: 'Catálogo', href: '#', active: true },
+  const tabs: { label: string; value: DashboardTab }[] = [
+    { label: 'Catálogo', value: 'catalogo' },
+    { label: 'Minhas Matérias', value: 'minhas-materias' },
   ]
 
   return (
@@ -44,19 +43,19 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
 
           {/* Nav links — desktop */}
           <nav className="hidden md:flex justify-items-start gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
+            {tabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => onTabChange(tab.value)}
                 className={[
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  link.active
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
+                  activeTab === tab.value
                     ? 'bg-brand-light text-brand-primary'
                     : 'text-ui-medium hover:bg-ui-bg hover:text-ui-dark',
                 ].join(' ')}
               >
-                {link.label}
-              </a>
+                {tab.label}
+              </button>
             ))}
           </nav>
 
@@ -104,19 +103,22 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
         {/* Mobile nav */}
         {mobileMenuOpen && (
           <nav className="md:hidden border-t border-ui-border py-2 flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
+            {tabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => {
+                  onTabChange(tab.value)
+                  setMobileMenuOpen(false)
+                }}
                 className={[
-                  'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                  link.active
+                  'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-left cursor-pointer',
+                  activeTab === tab.value
                     ? 'bg-brand-light text-brand-primary'
                     : 'text-ui-medium hover:bg-ui-bg',
                 ].join(' ')}
               >
-                {link.label}
-              </a>
+                {tab.label}
+              </button>
             ))}
           </nav>
         )}
