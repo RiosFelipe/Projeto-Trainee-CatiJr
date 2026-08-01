@@ -46,5 +46,6 @@ export type ValidationError = 'PREREQUISITO' | 'CREDITOS' | 'HORARIO'
 
 export interface CatalogDisciplina extends Disciplina {
   matriculaStatus: StatusMatricula | null
+  matriculaId: string | null
   validationError: ValidationError | null
 }

@@ -5,6 +5,7 @@ import type { CatalogDisciplina, StatusMatricula } from '../types'
 interface DisciplineCardProps {
   disciplina: CatalogDisciplina
   onEnroll: (id: string) => void
+  onCancel: (matriculaId: string) => void
   loading: boolean
 }
 
@@ -32,10 +33,12 @@ function formatHorario(dia: string, inicio: string, fim: string) {
   return `${dias[dia] || dia} ${inicio.substring(0, 5)}-${fim.substring(0, 5)}`
 }
 
-export default function DisciplineCard({ disciplina, onEnroll, loading }: DisciplineCardProps) {
+export default function DisciplineCard({ disciplina, onEnroll, onCancel, loading }: DisciplineCardProps) {
   const [showModal, setShowModal] = useState(false)
   const isEnrolled = disciplina.matriculaStatus !== null
   const isReprovada = disciplina.matriculaStatus === 'REPROVADA'
+  const isInscrita = disciplina.matriculaStatus === 'INSCRITA'
+  const isConcluida = disciplina.matriculaStatus === 'CONCLUIDA'
   const isActuallyEnrolled = isEnrolled && !isReprovada
   const hasError = disciplina.validationError !== null
   const isIndisponivel = disciplina.status === 'INDISPONIVEL'
@@ -124,9 +127,22 @@ export default function DisciplineCard({ disciplina, onEnroll, loading }: Discip
       )}
 
       {isActuallyEnrolled && (
-        <div className="text-xs font-semibold text-brand-primary bg-brand-light px-3 py-1.5 rounded-lg text-center mt-auto">
-          Status: {statusLabels[disciplina.matriculaStatus!]}
-        </div>
+        <>
+          {isInscrita && (
+            <button
+              onClick={() => disciplina.matriculaId && onCancel(disciplina.matriculaId)}
+              disabled={loading}
+              className="w-full bg-red-500 text-white font-medium text-sm leading-5 px-4 py-2 rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
+            >
+              {loading ? 'Cancelando...' : 'Cancelar Inscrição'}
+            </button>
+          )}
+          {isConcluida && (
+            <div className="text-xs font-semibold text-brand-primary bg-brand-light px-3 py-1.5 rounded-lg text-center mt-auto">
+              Status: {statusLabels[disciplina.matriculaStatus!]}
+            </div>
+          )}
+        </>
       )}
 
       {!isActuallyEnrolled && !isIndisponivel && (

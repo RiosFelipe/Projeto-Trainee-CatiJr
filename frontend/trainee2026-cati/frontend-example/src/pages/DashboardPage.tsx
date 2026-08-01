@@ -106,7 +106,7 @@ export default function DashboardPage() {
           }
         }
 
-        return { ...d, matriculaStatus, validationError }
+        return { ...d, matriculaStatus, matriculaId: enrollment?.id ?? null, validationError }
       })
 
       setDisciplinas(catalog)
@@ -127,6 +127,23 @@ export default function DashboardPage() {
         err.response?.data?.message ||
         err.response?.data ||
         'Erro ao realizar inscrição.'
+      alert(typeof msg === 'string' ? msg : JSON.stringify(msg))
+    } finally {
+      setEnrollingId(null)
+    }
+  }
+
+  async function handleCancel(matriculaId: string) {
+    if (!confirm('Tem certeza que deseja cancelar esta inscrição?')) return
+    try {
+      setEnrollingId(matriculaId)
+      await api.delete(`/matriculas/${matriculaId}`)
+      await loadCatalog()
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        'Erro ao cancelar inscrição.'
       alert(typeof msg === 'string' ? msg : JSON.stringify(msg))
     } finally {
       setEnrollingId(null)
@@ -198,6 +215,7 @@ export default function DashboardPage() {
                 key={d.id}
                 disciplina={d}
                 onEnroll={handleEnroll}
+                onCancel={handleCancel}
                 loading={enrollingId === d.id}
               />
             ))}
