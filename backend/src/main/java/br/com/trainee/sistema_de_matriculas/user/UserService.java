@@ -1,5 +1,7 @@
 package br.com.trainee.sistema_de_matriculas.user;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.com.trainee.sistema_de_matriculas.dto.LoginDto;
@@ -29,6 +31,11 @@ public class UserService {
         user.setPassword(passwordHashed);
 
         return this.userRepository.save(user); //salva o cadastro no postgres
+    }
+
+    public UserModel buscarPorId(UUID id) {
+        return this.userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     }
 
     public String login(LoginDto loginDto) {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GraduationCapIcon, MenuIcon } from '../assets/icons'
-import type { User } from '../types'
+import type { User, Page } from '../types'
 
 export type DashboardTab = 'catalogo' | 'minhas-materias'
 
@@ -8,6 +8,7 @@ interface DashboardHeaderProps {
   user: User | null
   activeTab: DashboardTab
   onTabChange: (tab: DashboardTab) => void
+  onNavigate: (page: Page) => void
 }
 
 function getInitials(name: string): string {
@@ -18,7 +19,7 @@ function getInitials(name: string): string {
     .join('')
 }
 
-export default function DashboardHeader({ user, activeTab, onTabChange }: DashboardHeaderProps) {
+export default function DashboardHeader({ user, activeTab, onTabChange, onNavigate }: DashboardHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const tabs: { label: string; value: DashboardTab }[] = [
@@ -76,7 +77,10 @@ export default function DashboardHeader({ user, activeTab, onTabChange }: Dashbo
               </button>
 
             {/* User badge */}
-            <div className="flex items-center gap-2">
+            <button
+              onClick={() => onNavigate('perfil')}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <div className="w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center shrink-0">
                 <span className="text-white text-xs font-semibold leading-none">
                   {getInitials(user?.nome || user?.email || 'U')}
@@ -88,7 +92,7 @@ export default function DashboardHeader({ user, activeTab, onTabChange }: Dashbo
                 </span>
                 <span className="text-xs text-ui-muted">Aluno</span>
               </div>
-            </div>
+            </button>
 
             {/* Mobile menu toggle */}
             <button

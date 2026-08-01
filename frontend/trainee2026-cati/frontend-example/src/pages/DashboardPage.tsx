@@ -3,9 +3,13 @@ import DashboardHeader, { type DashboardTab } from '../components/DashboardHeade
 import CatalogHeading from '../components/CatalogHeading'
 import DisciplineCard from '../components/DisciplineCard'
 import api, { decodeToken } from '../services/api'
-import type { Disciplina, Matricula, CatalogDisciplina, User, ValidationError } from '../types'
+import type { Disciplina, Matricula, CatalogDisciplina, User, ValidationError, Page } from '../types'
 
-export default function DashboardPage() {
+interface DashboardPageProps {
+  onNavigate: (page: Page) => void
+}
+
+export default function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [user, setUser] = useState<User | null>(null)
   const [disciplinas, setDisciplinas] = useState<CatalogDisciplina[]>([])
   const [loading, setLoading] = useState(true)
@@ -190,7 +194,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-ui-bg">
-      <DashboardHeader user={user} activeTab={activeTab} onTabChange={setActiveTab} />
+      <DashboardHeader user={user} activeTab={activeTab} onTabChange={setActiveTab} onNavigate={onNavigate} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {isMinhasMaterias ? (
