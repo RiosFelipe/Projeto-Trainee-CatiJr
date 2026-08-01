@@ -10,4 +10,11 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer()],
     },
   },
+  server: {
+    proxy: {
+      '/aluno': 'http://localhost:8080',
+      '/disciplina': 'http://localhost:8080',
+      '/matriculas': 'http://localhost:8080',
+    },
+  },
 })
