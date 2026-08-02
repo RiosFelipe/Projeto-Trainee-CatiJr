@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import { GraduationCapIcon, EyeOffIcon } from '../assets/icons'
 import InputField from './InputField'
 import { Page } from '../types'
-import api from '../services/api'
+import api, { getErrorMessage } from '../services/api'
 
 interface SignupCardProps {
   onNavigate?: (page: Page) => void
@@ -36,8 +36,7 @@ export default function SignupCard({ onNavigate }: SignupCardProps) {
       onNavigate?.('login')
     } catch (error: any) {
       if (error.response) {
-        const mensagemDoJava = error.response.data?.message || error.response.data
-        alert(typeof mensagemDoJava === 'string' ? mensagemDoJava : 'Erro ao realizar o cadastro.')
+        alert(getErrorMessage(error, 'Erro ao realizar o cadastro.'))
       } else if (error.request) {
         alert('Servidor Spring Boot offline ou sem resposta.')
       } else {

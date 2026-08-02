@@ -39,4 +39,14 @@ export function getUserIdFromToken(): string | null {
   return decoded?.sub ?? null
 }
 
+export function getErrorMessage(error: any, fallback: string): string {
+  if (error.response?.data?.messages) {
+    return Object.values(error.response.data.messages).join('; ')
+  }
+  if (error.response?.data?.message) {
+    return error.response.data.message
+  }
+  return fallback
+}
+
 export default api

@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import { GraduationCapIcon, EmailIcon, LockIcon, ArrowRightIcon } from '../assets/icons'
 import InputField from './InputField'
 import { Page } from '../types'
-import api from '../services/api'
+import api, { getErrorMessage } from '../services/api'
 
 interface LoginCardProps {
   onNavigate?: (page: Page) => void
@@ -30,8 +30,7 @@ export default function LoginCard({ onNavigate }: LoginCardProps) {
       onNavigate?.('dashboard')
     } catch (error: any) {
       if (error.response) {
-        const errorMessage = error.response.data?.message || error.response.data
-        alert(typeof errorMessage === 'string' ? errorMessage : 'E-mail ou senha incorretos.')
+        alert(getErrorMessage(error, 'Erro ao processar a requisição de login.'))
       } else if (error.request) {
         alert('Sem resposta do servidor. O seu backend Spring Boot está rodando?')
       } else {

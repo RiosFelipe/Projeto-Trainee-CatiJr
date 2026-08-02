@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react'
 import { GraduationCapIcon } from '../assets/icons'
 import InputField from './InputField'
 import { Page } from '../types'
-import api from '../services/api'
+import api, { getErrorMessage } from '../services/api'
 
 interface ForgotPasswordCardProps {
   onNavigate?: (page: Page) => void
@@ -42,8 +42,7 @@ export default function ForgotPasswordCard({ onNavigate }: ForgotPasswordCardPro
 
     } catch (error: any) {
       if (error.response) {
-        const msg = error.response.data?.message || error.response.data
-        alert(typeof msg === 'string' ? msg : 'Erro ao redefinir a senha.')
+        alert(getErrorMessage(error, 'Erro ao redefinir a senha.'))
       } else {
         alert('Erro ao redefinir a senha.')
       }
